@@ -90,10 +90,10 @@ export default function DashboardPage() {
   if (!session?.user) return null
 
   const canCloseHelpdesk = (t: Ticket) =>
-    t.assigned_to === session.user.email && t.status !== "closed"
+    t.assigned_to === session.user?.email && t.status !== "closed"
 
   const canCloseUser = (t: Ticket) =>
-    t.created_by === session.user.email && t.status !== "closed"
+    t.created_by === session.user?.email && t.status !== "closed"
 
   return (
     <main className="min-h-screen bg-zinc-900 text-white p-8 relative">
