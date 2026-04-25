@@ -17,16 +17,20 @@ const handler = NextAuth({
           scope: "read:user user:email",
         },
       },
-    }),
+    })
   ],
 
   session: { strategy: "jwt" },
 
   callbacks: {
     async signIn({ user, profile }) {
+        
       const p = profile as any
 
-      const email = user?.email || p?.email
+      const email =
+          user?.email ||
+          (profile as any)?.email ||
+          (profile as any)?.email_address
       const github_login = p?.login
       const name = p?.name || p?.login
       const image = p?.avatar_url
