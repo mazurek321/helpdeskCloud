@@ -96,7 +96,7 @@ export default function DashboardPage() {
     t.created_by === session.user?.email && t.status !== "closed"
 
   return (
-    <main className="min-h-screen bg-zinc-900 text-white p-8 relative">
+    <main className="min-h-screen bg-zinc-800 text-white p-8 relative">
       <div className="max-w-5xl mx-auto space-y-8">
 
         <div className="flex justify-between items-center">
@@ -119,7 +119,7 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-gray-800 p-6 rounded-xl flex justify-between items-center">
+        <div className="bg-zinc-900 p-6 rounded-xl flex justify-between items-center">
           <div className="flex flex-col">
             <p className="text-lg font-semibold">{session.user.name}</p>
             <p className="text-sm text-gray-400">{session.user.email}</p>
@@ -158,9 +158,9 @@ export default function DashboardPage() {
           </div>
         )}
 
-        <div className="bg-gray-700 rounded-xl overflow-hidden">
+        <div className="bg-zinc-600 rounded-xl overflow-hidden">
           <table className="w-full table-fixed text-center">
-            <thead className="bg-gray-800">
+            <thead className="bg-zinc-900">
               <tr>
                 <th className="p-3">Tytuł</th>
                 <th className="p-3">Status</th>
@@ -173,7 +173,7 @@ export default function DashboardPage() {
                 <tr
                   key={t.id}
                   onClick={() => setSelectedTicket(t)}
-                  className="border-t border-gray-600 hover:bg-gray-600 cursor-pointer"
+                  className="border-t border-gray-400 cursor-pointer"
                 >
                   <td className="p-3">{t.title}</td>
                   <td className="p-3">{t.status}</td>
@@ -230,7 +230,7 @@ export default function DashboardPage() {
           onClick={() => setSelectedTicket(null)}
         >
           <div
-            className="bg-gray-800 p-6 rounded-xl w-full max-w-md space-y-4"
+            className="bg-indigo-950 p-6 rounded-xl w-full max-w-md space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold">{selectedTicket.title}</h2>

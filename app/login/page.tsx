@@ -16,44 +16,41 @@ export default function LoginPage() {
 
   if (status === "loading") {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
+      <main className="min-h-screen flex items-center justify-center bg-zinc-900 text-white">
         <p>Loading...</p>
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-zinc-900 text-white p-6">
-      <div className="text-center space-y-6 max-w-md w-full mt-[-100px]">
+    <main className="min-h-screen flex items-center justify-center bg-zinc-800 text-white p-6">
 
-        <img 
-          src="/welcome.gif" 
+      <div className="w-full max-w-2xl bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl py-16 px-10 flex flex-col items-center text-center space-y-8">
+
+        <img
+          src="/welcome.gif"
           alt="penguin"
-          className="w-32 mx-auto"
+          className="w-36"
         />
 
         <h1 className="text-4xl font-bold">
           Witamy w systemie
         </h1>
 
-        <p className="text-gray-400">
-          Zaloguj się przez GitHub, aby uzyskać pomoc
+        <p className="text-gray-400 text-base">
+          Zaloguj się przez GitHub, aby uzyskać dostęp do panelu
         </p>
 
         <button
           onClick={() => signIn("github")}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition cursor-pointer"
+          className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white text-black rounded-xl hover:bg-gray-200 transition cursor-pointer font-medium"
         >
-          <img
-            src="/gh.png"
-            alt="GitHub"
-            className="w-5 h-5"
-          />
-
+          <img src="/gh.png" alt="GitHub" className="w-5 h-5" />
           Zaloguj się z GitHub
         </button>
 
       </div>
+
     </main>
   )
 }
