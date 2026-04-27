@@ -1,12 +1,9 @@
-export type TicketStatus = "open" | "pending" | "closed"
-
 export type Ticket = {
-  id: string
+  id: number
   title: string
   description: string
-  status: TicketStatus
-  created_at: string
-
-  created_by: string | null
+  status: string
+  created_by: string
   assigned_to: string | null
+  created_at: string
 }
