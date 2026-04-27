@@ -1,12 +1,16 @@
-export default function UserCard({ user, isHelpdesk }: any) {
+export default function UserCard({ user, role }: any) {
   return (
-    <div className="bg-zinc-900 p-6 rounded-xl flex justify-between shadow-[0_0_3px_black]">
+    <div className="bg-zinc-900 p-6 rounded-xl flex justify-between">
       <div>
         <p className="text-lg font-semibold">{user.name}</p>
         <p className="text-sm text-gray-400">{user.email}</p>
 
-        {isHelpdesk && (
+        {role === "helpdesk" && (
           <span className="text-xs text-cyan-400">Helpdesk</span>
+        )}
+
+        {role === "admin" && (
+          <span className="text-xs text-red-400">Admin</span>
         )}
       </div>
 

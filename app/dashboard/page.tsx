@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession, signOut } from "next-auth/react"
+import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
@@ -11,22 +11,26 @@ import TicketsTable from "@/components/dashboard/TicketsTable"
 import TicketModal from "@/components/dashboard/TicketModal"
 import CreateTicketModal from "@/components/dashboard/CreateTicketModal"
 import Tabs from "@/components/dashboard/Tabs"
+import UsersTable from "@/components/dashboard/UsersTable"
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
 
   const [tickets, setTickets] = useState<Ticket[]>([])
+  const [users, setUsers] = useState<any[]>([])
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
-  const [tab, setTab] = useState<"all" | "new" | "accepted" | "closed">("all")
 
-  const [form, setForm] = useState({
-    title: "",
-    description: ""
-  })
+  const [tab, setTab] = useState<
+    "all" | "new" | "accepted" | "closed" | "users"
+  >("all")
 
-  const isHelpdesk = (session?.user as any)?.role === "helpdesk"
+  const [onlyMine, setOnlyMine] = useState(false)
+
+  const role = (session?.user as any)?.role
+  const isHelpdesk = role === "helpdesk"
+  const isAdmin = role === "admin"
 
   async function loadTickets() {
     const res = await fetch("/api/tickets")
@@ -34,26 +38,31 @@ export default function DashboardPage() {
     setTickets(Array.isArray(data) ? data : [])
   }
 
+  async function loadUsers() {
+    const res = await fetch("/api/users")
+    const data = await res.json()
+    setUsers(Array.isArray(data) ? data : [])
+  }
+
   useEffect(() => {
     if (status === "loading") return
     if (!session) router.replace("/login")
-    else loadTickets()
+
+    loadTickets()
+    if (isAdmin) loadUsers()
   }, [session, status])
 
   async function createTicket() {
-    const res = await fetch("/api/tickets", {
+    await fetch("/api/tickets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title: form.title,
-        description: form.description,
+        title: "",
+        description: "",
         created_by: session?.user?.email
       })
     })
 
-    if (!res.ok) return
-
-    setForm({ title: "", description: "" })
     setIsCreateOpen(false)
     loadTickets()
   }
@@ -73,14 +82,23 @@ export default function DashboardPage() {
     loadTickets()
   }
 
-  const filteredTickets = tickets.filter((t) => {
-    if (!isHelpdesk) return t.created_by === session?.user?.email
+  const userEmail = session?.user?.email
 
-    if (tab === "new") return !t.assigned_to && t.status !== "closed"
-    if (tab === "accepted") return !!t.assigned_to && t.status !== "closed"
-    if (tab === "closed") return t.status === "closed"
-    return true
-  })
+  const filteredTickets = tickets
+    .filter((t) => {
+      if (isAdmin || isHelpdesk) {
+        if (tab === "new") return !t.assigned_to && t.status !== "closed"
+        if (tab === "accepted") return !!t.assigned_to && t.status !== "closed"
+        if (tab === "closed") return t.status === "closed"
+        return true
+      }
+
+      return t.created_by === userEmail
+    })
+    .filter((t) => {
+      if (!onlyMine) return true
+      return t.assigned_to === userEmail || t.created_by === userEmail
+    })
 
   if (status === "loading") return <div>Loading...</div>
   if (!session?.user) return null
@@ -91,17 +109,39 @@ export default function DashboardPage() {
 
         <DashboardHeader onCreate={() => setIsCreateOpen(true)} />
 
-        <UserCard user={session.user} isHelpdesk={isHelpdesk} />
+        <UserCard user={session.user} role={role} />
 
-        {isHelpdesk && <Tabs tab={tab} setTab={setTab} />}
+        {(isHelpdesk || isAdmin) && (
+          <div className="flex items-center justify-between gap-3 flex-wrap">
 
-        <TicketsTable
-          tickets={filteredTickets}
-          isHelpdesk={isHelpdesk}
-          session={session}
-          onSelect={setSelectedTicket}
-          onUpdate={updateTicket}
-        />
+            <Tabs role={role} tab={tab} setTab={setTab} />
+
+            <button
+              onClick={() => setOnlyMine((prev) => !prev)}
+              className={`px-3 py-1 rounded border transition ${
+                onlyMine
+                  ? "bg-indigo-600 border-indigo-400 text-white"
+                  : "bg-gray-700 border-gray-600 text-gray-200 hover:bg-gray-600"
+              }`}
+            >
+              Tylko moje
+            </button>
+
+          </div>
+        )}
+
+        {isAdmin && tab === "users" ? (
+          <UsersTable users={users} onReload={loadUsers} />
+        ) : (
+          <TicketsTable
+            tickets={filteredTickets}
+            isHelpdesk={isHelpdesk || isAdmin}
+            session={session}
+            onSelect={setSelectedTicket}
+            onUpdate={updateTicket}
+          />
+        )}
+
       </div>
 
       {selectedTicket && (
@@ -113,8 +153,8 @@ export default function DashboardPage() {
 
       {isCreateOpen && (
         <CreateTicketModal
-          form={form}
-          setForm={setForm}
+          form={{ title: "", description: "" }}
+          setForm={() => {}}
           onClose={() => setIsCreateOpen(false)}
           onSubmit={createTicket}
         />

@@ -41,9 +41,9 @@ export default function TicketsTable({
   }
 
   return (
-    <div className="bg-zinc-750 border border-zinc-600 rounded-xl overflow-hidden shadow-[0_0_5px_black]">
+    <div className="bg-zinc-950/80 border border-zinc-600 rounded-xl overflow-hidden shadow-[0_0_5px_black]">
       <table className="w-full table-fixed text-center">
-        <thead className="bg-zinc-900 text-gray-300 border-b border-zinc-700">
+        <thead className="bg-zinc-950/50 text-gray-300 border-b border-zinc-700">
           <tr>
             <th className="p-3">Tytuł</th>
             <th className="p-3">Status</th>
@@ -51,7 +51,7 @@ export default function TicketsTable({
           </tr>
         </thead>
 
-        <tbody className="bg-zinc-700">
+        <tbody className="bg-zinc-900">
           {tickets.map((t) => (
             <tr
               key={t.id}

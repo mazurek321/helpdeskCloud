@@ -12,7 +12,7 @@ export default function TicketModal({ ticket, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="bg-indigo-950 p-6 rounded-xl w-full max-w-md space-y-4"
+        className="bg-zinc-800 p-6 rounded-xl w-full max-w-md space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold">{ticket.title}</h2>
