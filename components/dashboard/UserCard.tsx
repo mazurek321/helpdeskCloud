@@ -14,7 +14,7 @@ export default function UserCard({ user, role }: any) {
         )}
       </div>
 
-      <img src={user.image} className="w-14 h-14 rounded-full" />
+      <img src={user?.image || "/avatar.png"} className="w-14 h-14 rounded-full" />
     </div>
   )
 }

@@ -21,6 +21,7 @@ export default function DashboardPage() {
   const [users, setUsers] = useState<any[]>([])
   const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null)
   const [isCreateOpen, setIsCreateOpen] = useState(false)
+  const [form, setForm] = useState({ title: "", description: "" })
 
   const [tab, setTab] = useState<
     "all" | "new" | "accepted" | "closed" | "users"
@@ -57,13 +58,14 @@ export default function DashboardPage() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        title: "",
-        description: "",
+        title: form.title,
+        description: form.description,
         created_by: session?.user?.email
       })
     })
 
     setIsCreateOpen(false)
+    setForm({ title: "", description: "" })
     loadTickets()
   }
 
@@ -107,7 +109,12 @@ export default function DashboardPage() {
     <main className="min-h-screen bg-zinc-800 text-white p-8">
       <div className="max-w-5xl mx-auto space-y-8">
 
-        <DashboardHeader onCreate={() => setIsCreateOpen(true)} />
+        <DashboardHeader
+          onCreate={() => {
+            setForm({ title: "", description: "" })
+            setIsCreateOpen(true)
+          }}
+        />
 
         <UserCard user={session.user} role={role} />
 
@@ -153,8 +160,8 @@ export default function DashboardPage() {
 
       {isCreateOpen && (
         <CreateTicketModal
-          form={{ title: "", description: "" }}
-          setForm={() => {}}
+          form={form}
+          setForm={setForm}
           onClose={() => setIsCreateOpen(false)}
           onSubmit={createTicket}
         />

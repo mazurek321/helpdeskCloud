@@ -1,5 +1,6 @@
 import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github"
+import GoogleProvider from "next-auth/providers/google"
 import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
@@ -15,68 +16,106 @@ export const authOptions = {
       authorization: {
         params: { scope: "read:user user:email" }
       }
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!
     })
   ],
 
-  session: { strategy: "jwt" as const},
+  session: {
+    strategy: "jwt" as const
+  },
 
   callbacks: {
-    async signIn({ user, profile }: any) {
-      const p = profile as any
+    async signIn({ user, account, profile }: any) {
+      if (!account) return false
 
-      const email =
-        user?.email ||
-        p?.email ||
-        p?.email_address
+      const provider = account.provider
+      const provider_account_id = account.providerAccountId
 
-      const github_login = p?.login
-      const name = p?.name || p?.login
-      const image = p?.avatar_url
+      const { data: existingAccount } = await supabase
+        .from("accounts")
+        .select("*")
+        .eq("provider", provider)
+        .eq("provider_account_id", provider_account_id)
+        .maybeSingle()
 
+      if (existingAccount) return true
+
+      const email = user?.email || profile?.email
       if (!email) return false
 
-      const { data } = await supabase
+      let userId: string
+
+      const { data: existingUser } = await supabase
         .from("users")
         .select("id")
         .eq("email", email)
         .maybeSingle()
 
-      if (!data) {
-        await supabase.from("users").insert({
-          email,
-          github_login,
-          name,
-          image,
-          role: "user"
-        })
+      if (existingUser) {
+        userId = existingUser.id
       } else {
-        await supabase
+        const { data: newUser, error } = await supabase
           .from("users")
-          .update({ github_login, name, image })
-          .eq("email", email)
+          .upsert(
+            {
+              email,
+              name: user.name,
+              image: user.image,
+              role: "user"
+            },
+            { onConflict: "email" }
+          )
+          .select("id")
+          .single()
+
+        if (error || !newUser) return false
+
+        userId = newUser.id
       }
+
+      const { error: accError } = await supabase
+        .from("accounts")
+        .insert({
+          user_id: userId,
+          provider,
+          provider_account_id,
+          access_token: account.access_token,
+          refresh_token: account.refresh_token,
+          expires_at: account.expires_at
+        })
+
+      if (accError) return false
 
       return true
     },
 
-    async jwt({ token }: any) {
-      const email = token.email as string
-
-      if (email) {
-        const { data } = await supabase
-          .from("users")
-          .select("email,name,image,role,github_login")
-          .eq("email", email)
+    async jwt({ token, account }: any) {
+      if (account) {
+        const { data: acc } = await supabase
+          .from("accounts")
+          .select("user_id")
+          .eq("provider", account.provider)
+          .eq("provider_account_id", account.providerAccountId)
           .maybeSingle()
 
-        if (data) {
-          token.email = data.email
-          token.name = data.name
-          token.image = data.image
-          token.role = data.role ?? "user"
-          token.github_login = data.github_login
-        } else {
-          token.role = "user"
+        if (acc) token.userId = acc.user_id
+      }
+
+      if (token.userId) {
+        const { data: user } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", token.userId)
+          .maybeSingle()
+
+        if (user) {
+          token.name = user.name
+          token.email = user.email
+          token.image = user.image
+          token.role = user.role
         }
       }
 
@@ -85,11 +124,11 @@ export const authOptions = {
 
     async session({ session, token }: any) {
       if (session.user) {
+        session.user.id = token.userId
         session.user.email = token.email
         session.user.name = token.name
         session.user.image = token.image
-        session.user.role = token.role ?? "user"
-        session.user.github_login = token.github_login
+        session.user.role = token.role
       }
 
       return session

@@ -38,16 +38,28 @@ export default function LoginPage() {
         </h1>
 
         <p className="text-gray-400 text-base">
-          Zaloguj się przez GitHub, aby uzyskać dostęp do panelu
+          Zaloguj się, aby uzyskać dostęp do panelu
         </p>
 
-        <button
-          onClick={() => signIn("github")}
-          className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white text-black rounded-xl hover:bg-gray-200 transition cursor-pointer font-medium"
-        >
-          <img src="/gh.png" alt="GitHub" className="w-5 h-5" />
-          Zaloguj się z GitHub
-        </button>
+        <div className="flex flex-col gap-4 w-full">
+
+          <button
+            onClick={() => signIn("github")}
+            className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition cursor-pointer font-medium"
+          >
+            <img src="/gh.png" alt="GitHub" className="w-5 h-5" />
+            Zaloguj się z GitHub
+          </button>
+
+          <button
+            onClick={() => signIn("google")}
+            className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white text-black rounded-xl hover:bg-gray-200 transition cursor-pointer font-medium"
+          >
+            <img src="/google.png" alt="Google" className="w-5 h-5" />
+            Zaloguj się z Google
+          </button>
+
+        </div>
 
       </div>
 
