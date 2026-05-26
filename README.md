@@ -33,5 +33,3 @@ Aplikacja umożliwia tworzenie, obsługę i zamykanie ticketów przez użytkowni
 - 🧑 Role-based access (user / helpdesk / admin)
 
 
-ocalhost:3000](http://localhost:3000) with your browser to see the result.
-
