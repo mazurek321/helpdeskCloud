@@ -7,7 +7,7 @@ Aplikacja umożliwia tworzenie, obsługę i zamykanie ticketów przez użytkowni
 
 ## 🚀 Funkcje
 
-- 🔐 Logowanie przez GitHub (NextAuth)
+- 🔐 Logowanie przez GitHub, Google i lokalny formularz + rejestracja (NextAuth)
 - 📝 Tworzenie ticketów przez użytkowników
 - 👨‍💻 Panel helpdesk
 - 📌 Przypisywanie ticketów do pracowników
@@ -29,28 +29,9 @@ Aplikacja umożliwia tworzenie, obsługę i zamykanie ticketów przez użytkowni
 - 🔌 Next.js API Routes
 
 ### Auth
-- 🔑 NextAuth (GitHub Provider)
-- 🧑 Role-based access (user / helpdesk)
+- 🔑 NextAuth (GitHub Provider, Google provider)
+- 🧑 Role-based access (user / helpdesk / admin)
 
 
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ocalhost:3000](http://localhost:3000) with your browser to see the result.
 
