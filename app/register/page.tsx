@@ -1,51 +1,55 @@
 "use client"
 
-import { signIn, useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
-export default function LoginPage() {
+export default function RegisterPage() {
 
-  const { data: session, status } = useSession()
   const router = useRouter()
 
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
 
-  useEffect(() => {
-    if (session) {
-      router.replace("/dashboard")
-    }
-  }, [session, router])
-
-  async function handleCredentialsLogin() {
+  async function handleRegister() {
 
     setError("")
+    setLoading(true)
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false
-    })
+    try {
 
-    if (result?.error) {
-      setError("Nieprawidłowy email lub hasło")
-      return
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          password
+        })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || "Wystąpił błąd")
+        return
+      }
+
+      router.push("/login")
+
+    } catch (err) {
+
+      setError("Wystąpił błąd serwera")
+
+    } finally {
+
+      setLoading(false)
     }
-
-    router.push("/dashboard")
-  }
-
-  if (status === "loading") {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-black text-white">
-        <p className="text-zinc-400 animate-pulse">
-          Ładowanie...
-        </p>
-      </main>
-    )
   }
 
   return (
@@ -53,7 +57,7 @@ export default function LoginPage() {
 
       <div className="w-full max-w-xl bg-zinc-950/80 backdrop-blur border border-zinc-800 rounded-3xl shadow-[0_0_80px_rgba(0,0,0,0.6)] overflow-hidden">
 
-        <div className="w-full flex items-center justify-center pt-5">
+        <div className="w-full flex items-center justify-center pt-10">
           <img
             src="/welcome.gif"
             alt="welcome"
@@ -64,21 +68,44 @@ export default function LoginPage() {
         <div className="px-10 py-10 flex flex-col items-center text-center">
 
           <h1 className="text-4xl font-bold tracking-tight">
-            Witamy ponownie
+            Utwórz konto ✨
           </h1>
 
           <p className="text-zinc-400 mt-3 text-sm max-w-md">
-            Zaloguj się do swojego konta, aby uzyskać dostęp do panelu.
+            Załóż konto i uzyskaj dostęp do panelu systemu.
           </p>
 
-          {/* ERROR MESSAGE */}
           {error && (
             <div className="w-full mt-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
               {error}
             </div>
           )}
 
-          <div className="w-full mt-6 flex flex-col gap-4">
+          <div className="w-full mt-8 flex flex-col gap-4">
+
+            <input
+              type="text"
+              placeholder="Nazwa użytkownika"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value)
+                setError("")
+              }}
+              className="
+                w-full
+                px-5
+                py-4
+                rounded-2xl
+                bg-zinc-800/80
+                border
+                border-zinc-700
+                outline-none
+                focus:border-blue-500
+                focus:ring-4
+                focus:ring-blue-500/20
+                transition
+              "
+            />
 
             <input
               type="email"
@@ -129,13 +156,15 @@ export default function LoginPage() {
             />
 
             <button
-              onClick={handleCredentialsLogin}
+              onClick={handleRegister}
+              disabled={loading}
               className="
                 w-full
                 py-4
                 rounded-2xl
                 bg-blue-600
                 hover:bg-blue-500
+                disabled:opacity-50
                 active:scale-[0.99]
                 transition
                 font-semibold
@@ -144,51 +173,25 @@ export default function LoginPage() {
                 cursor-pointer
               "
             >
-              Zaloguj się
-            </button>
-
-          </div>
-
-          <div className="w-full flex items-center gap-4 my-8">
-            <div className="flex-1 h-px bg-zinc-800" />
-            <span className="text-zinc-500 text-sm">
-              lub kontynuuj przez
-            </span>
-            <div className="flex-1 h-px bg-zinc-800" />
-          </div>
-
-          <div className="w-full flex flex-col gap-4">
-
-            <button
-              onClick={() => signIn("github")}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white text-black rounded-2xl hover:bg-zinc-200 transition font-medium"
-            >
-              <img src="/gh.png" alt="GitHub" className="w-5 h-5" />
-              Zaloguj się z GitHub
-            </button>
-
-            <button
-              onClick={() => signIn("google")}
-              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white text-black rounded-2xl hover:bg-zinc-200 transition font-medium"
-            >
-              <img src="/google.png" alt="Google" className="w-5 h-5" />
-              Zaloguj się z Google
+              {loading ? "Tworzenie konta..." : "Zarejestruj się"}
             </button>
 
           </div>
 
           <p className="mt-8 text-zinc-400 text-sm">
-            Nie masz jeszcze konta?{" "}
+            Masz już konto?{" "}
             <Link
-              href="/register"
+              href="/login"
               className="text-blue-400 hover:text-blue-300 font-medium transition"
             >
-              Zarejestruj się
+              Zaloguj się
             </Link>
           </p>
 
         </div>
+
       </div>
+
     </main>
   )
 }

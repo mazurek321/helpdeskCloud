@@ -34,14 +34,14 @@ export default function TicketsTable({
 
   if (!tickets.length) {
     return (
-      <div className="bg-zinc-750 border border-zinc-600 p-6 rounded-xl text-center text-gray-300">
+      <div className="bg-zinc-900 border border-zinc-600 p-6 rounded-xl text-center text-gray-300">
         Brak ticketów
       </div>
     )
   }
 
   return (
-    <div className="bg-zinc-950/80 border border-zinc-600 rounded-xl overflow-hidden shadow-[0_0_5px_black]">
+    <div className="bg-zinc-950 border border-zinc-600 rounded-xl overflow-hidden shadow-[0_0_5px_black]">
       <table className="w-full table-fixed text-center">
         <thead className="bg-zinc-950/50 text-gray-300 border-b border-zinc-700">
           <tr>

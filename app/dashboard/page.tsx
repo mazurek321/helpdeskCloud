@@ -106,8 +106,8 @@ export default function DashboardPage() {
   if (!session?.user) return null
 
   return (
-    <main className="min-h-screen bg-zinc-800 text-white p-8">
-      <div className="max-w-5xl mx-auto space-y-8">
+    <main className="min-h-screen bg-gradient-to-br from-zinc-700 via-zinc-500 to-zinc-700 text-white p-8">
+      <div className="max-w-5xl mx-auto space-y-3">
 
         <DashboardHeader
           onCreate={() => {
